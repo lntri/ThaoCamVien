@@ -2,6 +2,7 @@ streamlit
 pandas
 matplotlib
 seaborn
-pyqrcode
+qrcode
 pypng
 Pillow
+openpyxl
