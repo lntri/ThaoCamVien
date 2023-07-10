@@ -228,7 +228,8 @@ Thành tiền: {str('{:,.0f}'.format(thanh_tien))}
 <p>Số vé người lớn: {str(num_adult_tickets)}</p>
 <p>Số vé trẻ em: {str(num_child_tickets)}</p>
 <p>Thành tiền: <b>{str('{:,.0f}'.format(thanh_tien))}</b></p>
-<p>Địa chỉ: <a href="https://goo.gl/maps/J64xhAMEKspgdJ5K6" target="_blank">https://goo.gl/maps/J64xhAMEKspgdJ5K6</a></p>'''
+<p>Địa chỉ: <a href="https://goo.gl/maps/J64xhAMEKspgdJ5K6" target="_blank">https://goo.gl/maps/J64xhAMEKspgdJ5K6</a></p>
+<p><small><a href="https://thaocamvien.streamlit.app/">Thảo Cầm Viên</a></small></p>'''
             mtext = MIMEText(content, "html")
             msg.attach(mtext)
             connection.sendmail(msg["From"], msg["To"], msg.as_string())
