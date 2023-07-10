@@ -11,6 +11,7 @@ from datetime import datetime
 import smtplib
 # import pyqrcode as pq
 import qrcode
+from io import BytesIO
 
 
 def add_bg_from_local(image_file):
@@ -54,13 +55,28 @@ def validate_email(email):
 #     return qr, path
 
 
+def image_to_base64(image):
+    buff = BytesIO()
+    image.save(buff, format="JPEG")
+    img_str = base64.b64encode(buff.getvalue())
+    return img_str
+
+
+# def image_to_base64(image_path):
+#     with open(image_path, "rb") as image_file:
+#         encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
+#         return encoded_string
+
+
 def create_content_qrcode(content, ticket_code):
     data = f"{content} - {ticket_code}"
     qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10, border=4)
     qr.add_data(data)
     qr.make(fit=True)
     qr_img = qr.make_image(fill_color="black", back_color="white")
-    qr_img.save(f'images/qrcode/{ticket_code}.png')
+    encoded_string = image_to_base64(qr_img)
+    # qr_img.save(f'images/qrcode/{ticket_code}.png')
+    return encoded_string
 
 
 data_birds = pd.read_csv("data/birds.csv")
@@ -189,6 +205,14 @@ with tab4:
             tickets = pd.concat([tickets, df], ignore_index=True)
             tickets.to_csv('data/orders/tickets.csv', index=False)
 
+            # Gọi hàm để tạo mã QR
+            noidung = f'''Họ tên: {fullname}
+Số vé người lớn: {str(num_adult_tickets)}
+Số vé trẻ em: {str(num_child_tickets)}
+Thành tiền: {str('{:,.0f}'.format(thanh_tien))}
+'''
+            image_string = create_content_qrcode(noidung, ticket_code).decode()
+
             # Gửi mail
             email_sender = 'ltvpython@csc.hcmus.edu.vn'
             password = 'wvahyrllmszdatpb'
@@ -214,16 +238,8 @@ with tab4:
             tab4.success("Đặt mua vé thành công")
             tab4.markdown(content, unsafe_allow_html=True)
             
-            # Xuất mã QR
-            
-            # Gọi hàm để tạo mã QR
-            noidung = f'''Họ tên: {fullname}
-Số vé người lớn: {str(num_adult_tickets)}
-Số vé trẻ em: {str(num_child_tickets)}
-Thành tiền: {str('{:,.0f}'.format(thanh_tien))}
-'''
-            create_content_qrcode(noidung, ticket_code)
             # create_content_qrcode(ticket_code, ticket_code)
-            tab4.image(f'images/qrcode/{ticket_code}.png', width= 200)
+            # tab4.image(f'images/qrcode/{ticket_code}.png', width= 200)
+            tab4.image(f'data:image/{"jpg"};base64,{image_string}', width=200)
         else:
             tab4.error("Vui lòng nhập email chính xác để chúng tôi gửi vé đến quý khách.")
